@@ -68,7 +68,7 @@
           <button onclick="toggleYes(${index})" class="px-2 rounded-xl ${item.done === true ? 'bg-green-500 text-white' : 'bg-gray-200'}">Yes</button>
           <button onclick="toggleNo(${index})" class="px-2 rounded-xl ${item.done === false ? 'bg-red-500 text-white' : 'bg-gray-200'}">No</button>
         </div>
-        <button onclick="removeTask(${index})" class="bg-gray-300 px-2 rounded-xl">Remove</button>
+        <button onclick="removeTask(${index})" class="bg-red-500 text-white px-4 rounded-xl">Remove</button>
       `;
 
       section.appendChild(row);
