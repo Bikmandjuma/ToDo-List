@@ -1,122 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Task Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>Task Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  padding: 16px;
+}
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
-      padding: 16px;
-    }
+.container {
+  max-width: 700px;
+  margin: auto;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+h2 {
+  margin-bottom: 10px;
+}
 
-    h2 {
-      margin-bottom: 10px;
-    }
+input, button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
 
-    input, button {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-    }
+button {
+  cursor: pointer;
+}
 
-    button {
-      cursor: pointer;
-    }
+.add-task {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
 
-    .add-task {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
+.add-task input {
+  flex: 1;
+}
 
-    .add-task input {
-      flex: 1;
-    }
+.task {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 
-    .task {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      border: 1px solid #e5e7eb;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
+.task-content {
+  flex: 1;
+  min-width: 200px;
+}
 
-    .task-content {
-      flex: 1;
-      min-width: 200px;
-    }
+.task-content p {
+  margin: 0;
+}
 
-    .task-content p {
-      margin: 0;
-    }
+.time {
+  font-size: 12px;
+  color: teal;
+  padding-top:8px;
+}
 
-    .time {
-      font-size: 12px;
-      color: teal;
-      padding-top:8px;
-    }
+.actions {
+  display: flex;
+  gap: 6px;
+}
 
-    .actions {
-      display: flex;
-      gap: 6px;
-    }
+.yes {
+  background: #e5e7eb;
+}
 
-    .yes {
-      background: #e5e7eb;
-    }
+.yes.active {
+  background: #22c55e;
+  color: white;
+}
 
-    .yes.active {
-      background: #22c55e;
-      color: white;
-    }
+.no {
+  background: #e5e7eb;
+}
 
-    .no {
-      background: #e5e7eb;
-    }
+.no.active {
+  background: #ef4444;
+  color: white;
+}
 
-    .no.active {
-      background: #ef4444;
-      color: white;
-    }
+.remove {
+  background: #ef4444;
+  color: white;
+}
 
-    .remove {
-      background: #ef4444;
-      color: white;
-    }
+.edit {
+  background: #3b82f6;
+  color: white;
+}
 
-    @media (max-width: 500px) {
-      .task {
-        flex-direction: column;
-        align-items: stretch;
-      }
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
 
-      .actions {
-        justify-content: space-between;
-      }
-    }
-  </style>
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.modal-content li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.modal-content li:hover {
+  background-color: #f0f0f0;
+}
+
+.close-modal {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+@media (max-width: 500px) {
+  .task {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    justify-content: space-between;
+  }
+}
+
+.day-group {
+  margin-top: 20px;
+}
+.day-group h3 {
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
-  <h2 id="today"></h2>
-
+  <div>
+    <h2 id="today"></h2>
+    <button onclick="openHistory()" style="margin-bottom:5px;">📜 History</button>
+  </div>
   <div class="add-task">
     <input id="taskInput" type="text" placeholder="Enter your task..." />
     <button onclick="addTask()">Add</button>
@@ -125,106 +186,169 @@
   <div id="taskList"></div>
 </div>
 
+<!-- History Modal -->
+<div id="historyModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeHistory()">&times;</span>
+    <h3>Task History</h3>
+    <ul id="historyList"></ul>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeEdit()">&times;</span>
+    <h3>Edit Task</h3>
+    <input id="editInput" type="text" style="width:100%; padding:10px; margin-bottom:10px;" />
+    <button onclick="saveEdit()">Save</button>
+  </div>
+</div>
+
 <script>
-  const taskInput = document.getElementById("taskInput");
-  const taskList = document.getElementById("taskList");
+const taskInput = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
 
-  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let historyTasks = JSON.parse(localStorage.getItem("historyTasks")) || [];
 
-  // Show today's date like: 2026 January 19 Monday
-  function showToday() {
-    const d = new Date();
-    const options = { year: "numeric", month: "long", day: "numeric", weekday: "long" };
-    document.getElementById("today").textContent = d.toLocaleDateString("en-US", options);
-  }
+let editIndex = null;
 
-  showToday();
+// Show today's date
+function showToday() {
+  const d = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById("today").textContent = d.toLocaleDateString("en-US", options);
+}
+showToday();
 
-  function save() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }
+function save() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
-  function timeAgo(timestamp) {
-    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+function saveHistory() {
+  localStorage.setItem("historyTasks", JSON.stringify(historyTasks));
+}
 
-    if (seconds < 60) return "just now";
+function timeAgo(timestamp) {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes>1?"s":""} ago`;
+  const hours = Math.floor(minutes/60);
+  if (hours<24) return `${hours} hour${hours>1?"s":""} ago`;
+  const days = Math.floor(hours/24);
+  return `${days} day${days>1?"s":""} ago`;
+}
 
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+// Group tasks by day
+function groupTasks() {
+  const grouped = {};
+  tasks.forEach(task => {
+    const d = new Date(task.createdAt);
+    const key = d.toDateString(); // e.g. "Mon Jan 19 2026"
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(task);
+  });
+  return grouped;
+}
 
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-
-    const days = Math.floor(hours / 24);
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  }
-
-  function addTask() {
-    if (!taskInput.value.trim()) return;
-
-    tasks.unshift({
-      text: taskInput.value,
-      done: null,
-      createdAt: Date.now()
-    });
-
-    taskInput.value = "";
-    save();
-    render();
-  }
-
-  function toggleYes(index) {
-    tasks[index].done = true;
-    save();
-    render();
-  }
-
-  function toggleNo(index) {
-    tasks[index].done = false;
-    save();
-    render();
-  }
-
-  function removeTask(index) {
-    tasks.splice(index, 1);
-    save();
-    render();
-  }
-
-  function render() {
-    taskList.innerHTML = "";
-
-    tasks.forEach((task, index) => {
+function render() {
+  taskList.innerHTML = "";
+  const grouped = groupTasks();
+  Object.keys(grouped).sort((a,b)=> new Date(b) - new Date(a)).forEach(day => {
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "day-group";
+    const d = new Date(day);
+    dayDiv.innerHTML = `<h3>${d.toLocaleDateString("en-US",{ weekday:'long', year:'numeric', month:'long', day:'numeric'})}</h3>`;
+    
+    grouped[day].forEach((task, index) => {
       const div = document.createElement("div");
       div.className = "task";
-
       div.innerHTML = `
         <div class="task-content">
           <p>${task.text}</p>
           <p class="time">${timeAgo(task.createdAt)}</p>
         </div>
-
         <div class="actions">
-          <button class="yes ${task.done === true ? "active" : ""}"
-            onclick="toggleYes(${index})">Done ✔</button>
-
-          <button class="no ${task.done === false ? "active" : ""}"
-            onclick="toggleNo(${index})">Not done ✖</button>
-
-          <button class="remove"
-            onclick="removeTask(${index})">Remove</button>
+          <button class="yes ${task.done===true?"active":""}" onclick="toggleYes(${tasks.indexOf(task)})">✔</button>
+          <button class="no ${task.done===false?"active":""}" onclick="toggleNo(${tasks.indexOf(task)})">✖</button>
+          <button class="edit" onclick="openEdit(${tasks.indexOf(task)})">✏️</button>
+          <button class="remove" onclick="removeTask(${tasks.indexOf(task)})">Trash</button>
         </div>
       `;
-
-      taskList.appendChild(div);
+      dayDiv.appendChild(div);
     });
-  }
 
+    taskList.appendChild(dayDiv);
+  });
+}
+
+// Task functions
+function addTask() {
+  const text = taskInput.value.trim();
+  if(!text) return;
+  const task = { text, done:null, createdAt:Date.now() };
+  tasks.unshift(task);
+  addToHistory(text);
+  taskInput.value="";
+  save();
   render();
+}
 
-  // Auto update "time ago" every minute
-  setInterval(render, 60000);
+function addToHistory(text) {
+  if(!historyTasks.includes(text)){
+    historyTasks.unshift(text);
+    saveHistory();
+  }
+}
+
+function toggleYes(index){ tasks[index].done=true; save(); render(); }
+function toggleNo(index){ tasks[index].done=false; save(); render(); }
+function removeTask(index){ tasks.splice(index,1); save(); render(); }
+
+// History modal
+const historyModal = document.getElementById("historyModal");
+const historyList = document.getElementById("historyList");
+function openHistory(){
+  historyList.innerHTML="";
+  historyTasks.forEach(text=>{
+    const li = document.createElement("li");
+    li.textContent=text;
+    li.onclick=()=>{ taskInput.value=text; addTask(); closeHistory(); };
+    historyList.appendChild(li);
+  });
+  historyModal.style.display="block";
+}
+function closeHistory(){ historyModal.style.display="none"; }
+
+// Edit modal
+const editModal = document.getElementById("editModal");
+const editInput = document.getElementById("editInput");
+function openEdit(index){
+  editIndex=index;
+  editInput.value=tasks[index].text;
+  editModal.style.display="block";
+}
+function closeEdit(){ editModal.style.display="none"; editIndex=null; }
+function saveEdit(){
+  if(editIndex!==null && editInput.value.trim()!==""){
+    tasks[editIndex].text=editInput.value.trim();
+    addToHistory(tasks[editIndex].text);
+    save();
+    render();
+    closeEdit();
+  }
+}
+
+// Close modals on outside click
+window.onclick=function(e){
+  if(e.target===historyModal) closeHistory();
+  if(e.target===editModal) closeEdit();
+}
+
+render();
+setInterval(render,60000); // update "time ago"
 </script>
-
 </body>
 </html>
