@@ -68,8 +68,8 @@
 
     .time {
       font-size: 12px;
-      color: #6b7280;
-      margin-top: 4px;
+      color: blueviolet;
+      padding-top:8px;
     }
 
     .actions {
@@ -201,7 +201,7 @@
       div.innerHTML = `
         <div class="task-content">
           <p>${task.text}</p>
-          <p class="time">Added: ${timeAgo(task.createdAt)}</p>
+          <p class="time">${timeAgo(task.createdAt)}</p>
         </div>
 
         <div class="actions">
