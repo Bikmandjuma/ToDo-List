@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List Planner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+    <h1 class="text-2xl font-bold text-center mb-6">📝 To-Do List Planner</h1>
+
+    <!-- Form -->
+    <form id="taskForm" class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-6">
+      <input id="year" type="number" placeholder="Year" class="border p-2 rounded-xl" readonly>
+      <input id="month" type="text" placeholder="Month" class="border p-2 rounded-xl" readonly>
+      <input id="date" type="number" placeholder="Date" class="border p-2 rounded-xl" readonly>
+      <input id="day" type="text" placeholder="Day" class="border p-2 rounded-xl" readonly>
+      <input id="task" type="text" placeholder="Task" class="border p-2 rounded-xl col-span-1 md:col-span-5" required>
+      <button class="bg-blue-600 text-white rounded-xl p-2 col-span-1 md:col-span-5">Add Task</button>
+    </form>
+
+    <!-- Task Display -->
+    <div id="taskContainer" class="space-y-4"></div>
+  </div>
+
+<script>
+  const now = new Date();
+  const yearInput = document.getElementById("year");
+  const monthInput = document.getElementById("month");
+  const dateInput = document.getElementById("date");
+  const dayInput = document.getElementById("day");
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  // Set current date automatically
+  yearInput.value = now.getFullYear();
+  monthInput.value = monthNames[now.getMonth()];
+  dateInput.value = now.getDate();
+  dayInput.value = dayNames[now.getDay()];
+
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  const form = document.getElementById("taskForm");
+  const container = document.getElementById("taskContainer");
+
+  function save() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+
+  function render() {
+    container.innerHTML = "";
+
+    tasks.forEach((item, index) => {
+      const section = document.createElement("div");
+      section.className = "bg-gray-50 p-4 rounded-xl mb-4";
+
+      // Header shows full date
+      section.innerHTML = `<h2 class="font-bold mb-2">${item.year} ${item.month} ${item.date} ${item.day}</h2>`;
+
+      // Task row
+      const row = document.createElement("div");
+      row.className = "flex items-center justify-between bg-white p-2 rounded-xl gap-2";
+
+      row.innerHTML = `
+        <span class="flex-1">${item.task}</span>
+        <div class="flex gap-1">
+          <button onclick="toggleYes(${index})" class="px-2 rounded-xl ${item.done === true ? 'bg-green-500 text-white' : 'bg-gray-200'}">Yes</button>
+          <button onclick="toggleNo(${index})" class="px-2 rounded-xl ${item.done === false ? 'bg-red-500 text-white' : 'bg-gray-200'}">No</button>
+        </div>
+        <button onclick="removeTask(${index})" class="bg-gray-300 px-2 rounded-xl">Remove</button>
+      `;
+
+      section.appendChild(row);
+      container.appendChild(section);
+    });
+  }
+
+  function toggleYes(index){
+    tasks[index].done = true;
+    save();
+    render();
+  }
+
+  function toggleNo(index){
+    tasks[index].done = false;
+    save();
+    render();
+  }
+
+  function removeTask(index){
+    tasks.splice(index,1);
+    save();
+    render();
+  }
+
+  form.addEventListener("submit", e=>{
+    e.preventDefault();
+    tasks.push({
+      year: yearInput.value,
+      month: monthInput.value,
+      date: dateInput.value,
+      day: dayInput.value,
+      task: document.getElementById("task").value,
+      done: null
+    });
+    form.reset();
+    document.getElementById("task").focus();
+    save();
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
