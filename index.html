@@ -271,9 +271,9 @@ function render() {
           <p class="time">${timeAgo(task.createdAt)}</p>
         </div>
         <div class="actions">
-          <button class="yes ${task.done===true?"active":""}" onclick="toggleYes(${tasks.indexOf(task)})">✔</button>
-          <button class="no ${task.done===false?"active":""}" onclick="toggleNo(${tasks.indexOf(task)})">✖</button>
-          <button class="edit" onclick="openEdit(${tasks.indexOf(task)})">✏️</button>
+          <button class="yes ${task.done===true?"active":""}" onclick="toggleYes(${tasks.indexOf(task)})">Done</button>
+          <button class="no ${task.done===false?"active":""}" onclick="toggleNo(${tasks.indexOf(task)})">Not-done</button>
+          <button class="edit" onclick="openEdit(${tasks.indexOf(task)})">Edit</button>
           <button class="remove" onclick="removeTask(${tasks.indexOf(task)})">Trash</button>
         </div>
       `;
