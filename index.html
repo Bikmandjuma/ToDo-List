@@ -1,116 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-Do List Planner</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <title>Task Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .add-task {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .add-task input {
+      flex: 1;
+    }
+
+    .task {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .task-content {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .task-content p {
+      margin: 0;
+    }
+
+    .time {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .yes {
+      background: #e5e7eb;
+    }
+
+    .yes.active {
+      background: #22c55e;
+      color: white;
+    }
+
+    .no {
+      background: #e5e7eb;
+    }
+
+    .no.active {
+      background: #ef4444;
+      color: white;
+    }
+
+    .remove {
+      background: #ef4444;
+      color: white;
+    }
+
+    @media (max-width: 500px) {
+      .task {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .actions {
+        justify-content: space-between;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl p-6">
-    <h1 class="text-2xl font-bold text-center mb-6">📝 To-Do List Planner</h1>
+<body>
 
-    <!-- Form -->
-    <form id="taskForm" class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-6">
-      <input id="year" type="number" placeholder="Year" class="border p-2 rounded-xl" readonly>
-      <input id="month" type="text" placeholder="Month" class="border p-2 rounded-xl" readonly>
-      <input id="date" type="number" placeholder="Date" class="border p-2 rounded-xl" readonly>
-      <input id="day" type="text" placeholder="Day" class="border p-2 rounded-xl" readonly>
-      <input id="task" type="text" placeholder="Task" class="border p-2 rounded-xl col-span-1 md:col-span-5" required>
-      <button class="bg-blue-600 text-white rounded-xl p-2 col-span-1 md:col-span-5">Add Task</button>
-    </form>
+<div class="container">
+  <h2 id="today"></h2>
 
-    <!-- Task Display -->
-    <div id="taskContainer" class="space-y-4"></div>
+  <div class="add-task">
+    <input id="taskInput" type="text" placeholder="Enter your task..." />
+    <button onclick="addTask()">Add</button>
   </div>
 
+  <div id="taskList"></div>
+</div>
+
 <script>
-  const now = new Date();
-  const yearInput = document.getElementById("year");
-  const monthInput = document.getElementById("month");
-  const dateInput = document.getElementById("date");
-  const dayInput = document.getElementById("day");
-
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-
-  // Set current date automatically
-  yearInput.value = now.getFullYear();
-  monthInput.value = monthNames[now.getMonth()];
-  dateInput.value = now.getDate();
-  dayInput.value = dayNames[now.getDay()];
+  const taskInput = document.getElementById("taskInput");
+  const taskList = document.getElementById("taskList");
 
   let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-  const form = document.getElementById("taskForm");
-  const container = document.getElementById("taskContainer");
+
+  // Show today's date like: 2026 January 19 Monday
+  function showToday() {
+    const d = new Date();
+    const options = { year: "numeric", month: "long", day: "numeric", weekday: "long" };
+    document.getElementById("today").textContent = d.toLocaleDateString("en-US", options);
+  }
+
+  showToday();
 
   function save() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }
 
-  function render() {
-    container.innerHTML = "";
+  function timeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
 
-    tasks.forEach((item, index) => {
-      const section = document.createElement("div");
-      section.className = "bg-gray-50 p-4 rounded-xl mb-4";
+    if (seconds < 60) return "just now";
 
-      // Header shows full date
-      section.innerHTML = `<h2 class="font-bold mb-2">${item.year} ${item.month} ${item.date} ${item.day}</h2>`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
 
-      // Task row
-      const row = document.createElement("div");
-      row.className = "flex items-center justify-between bg-white p-2 rounded-xl gap-2";
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
 
-      row.innerHTML = `
-        <span class="flex-1">${item.task}</span>
-        <div class="flex gap-1">
-          <button onclick="toggleYes(${index})" class="px-2 rounded-xl ${item.done === true ? 'bg-green-500 text-white' : 'bg-gray-200'}">Yes</button>
-          <button onclick="toggleNo(${index})" class="px-2 rounded-xl ${item.done === false ? 'bg-red-500 text-white' : 'bg-gray-200'}">No</button>
-        </div>
-        <button onclick="removeTask(${index})" class="bg-red-500 text-white px-4 rounded-xl">Remove</button>
-      `;
-
-      section.appendChild(row);
-      container.appendChild(section);
-    });
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
   }
 
-  function toggleYes(index){
+  function addTask() {
+    if (!taskInput.value.trim()) return;
+
+    tasks.unshift({
+      text: taskInput.value,
+      done: null,
+      createdAt: Date.now()
+    });
+
+    taskInput.value = "";
+    save();
+    render();
+  }
+
+  function toggleYes(index) {
     tasks[index].done = true;
     save();
     render();
   }
 
-  function toggleNo(index){
+  function toggleNo(index) {
     tasks[index].done = false;
     save();
     render();
   }
 
-  function removeTask(index){
-    tasks.splice(index,1);
+  function removeTask(index) {
+    tasks.splice(index, 1);
     save();
     render();
   }
 
-  form.addEventListener("submit", e=>{
-    e.preventDefault();
-    tasks.push({
-      year: yearInput.value,
-      month: monthInput.value,
-      date: dateInput.value,
-      day: dayInput.value,
-      task: document.getElementById("task").value,
-      done: null
+  function render() {
+    taskList.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+      const div = document.createElement("div");
+      div.className = "task";
+
+      div.innerHTML = `
+        <div class="task-content">
+          <p>${task.text}</p>
+          <p class="time">Added: ${timeAgo(task.createdAt)}</p>
+        </div>
+
+        <div class="actions">
+          <button class="yes ${task.done === true ? "active" : ""}"
+            onclick="toggleYes(${index})">Yes</button>
+
+          <button class="no ${task.done === false ? "active" : ""}"
+            onclick="toggleNo(${index})">No</button>
+
+          <button class="remove"
+            onclick="removeTask(${index})">Remove</button>
+        </div>
+      `;
+
+      taskList.appendChild(div);
     });
-    form.reset();
-    document.getElementById("task").focus();
-    save();
-    render();
-  });
+  }
 
   render();
+
+  // Auto update "time ago" every minute
+  setInterval(render, 60000);
 </script>
+
 </body>
 </html>
