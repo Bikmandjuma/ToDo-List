@@ -68,7 +68,7 @@
 
     .time {
       font-size: 12px;
-      color: blueviolet;
+      color: teal;
       padding-top:8px;
     }
 
@@ -206,10 +206,10 @@
 
         <div class="actions">
           <button class="yes ${task.done === true ? "active" : ""}"
-            onclick="toggleYes(${index})">Yes</button>
+            onclick="toggleYes(${index})">Done ✔</button>
 
           <button class="no ${task.done === false ? "active" : ""}"
-            onclick="toggleNo(${index})">No</button>
+            onclick="toggleNo(${index})">Not done ✖</button>
 
           <button class="remove"
             onclick="removeTask(${index})">Remove</button>
