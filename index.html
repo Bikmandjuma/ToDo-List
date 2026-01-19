@@ -205,6 +205,20 @@ button {
   </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeDelete()">&times;</span>
+    <h3>Delete Task</h3>
+    <p>Are you sure you want to delete this task?</p>
+    <div style="text-align:right;">
+      <button onclick="confirmDelete()" style="background-color: #3b82f6;color: white;">Yes, Delete</button>
+      <button onclick="closeDelete()" style="background-color:red;color: white;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
 const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
@@ -213,6 +227,7 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let historyTasks = JSON.parse(localStorage.getItem("historyTasks")) || [];
 
 let editIndex = null;
+let deleteIndex = null;
 
 // Show today's date
 function showToday() {
@@ -284,6 +299,36 @@ function render() {
   });
 }
 
+// Update removeTask to trigger modal
+function removeTask(index){
+  deleteIndex = index;
+  document.getElementById("deleteModal").style.display = "block";
+}
+
+// Confirm deletion
+function confirmDelete(){
+  if(deleteIndex !== null){
+    tasks.splice(deleteIndex,1);
+    save();
+    render();
+    closeDelete();
+  }
+}
+
+// Close delete modal
+function closeDelete(){
+  document.getElementById("deleteModal").style.display = "none";
+  deleteIndex = null;
+}
+
+// Close modals on outside click (extend existing handler)
+window.onclick = function(e){
+  if(e.target === historyModal) closeHistory();
+  if(e.target === editModal) closeEdit();
+  if(e.target === document.getElementById("deleteModal")) closeDelete();
+}
+
+
 // Task functions
 function addTask() {
   const text = taskInput.value.trim();
@@ -305,7 +350,7 @@ function addToHistory(text) {
 
 function toggleYes(index){ tasks[index].done=true; save(); render(); }
 function toggleNo(index){ tasks[index].done=false; save(); render(); }
-function removeTask(index){ tasks.splice(index,1); save(); render(); }
+// function removeTask(index){ tasks.splice(index,1); save(); render(); }
 
 // History modal
 const historyModal = document.getElementById("historyModal");
